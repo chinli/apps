@@ -179,11 +179,13 @@ static void http_resp_callback(struct http_ctx *pctx,
 					enum http_final_call final_data)
 {
 	static int app_buf_len;
+	int cur_index;
 
 	/** body can't receive commplete*/
 	if (final_data == HTTP_DATA_MORE) {
 		/** copy the body to app buff*/
-		memcpy(&bin_buff[ota_req_size % BIN_BUF_SIZE], body, body_len);
+		cur_index = (ota_req_size + app_buf_len) % BIN_BUF_SIZE;
+		memcpy(&bin_buff[cur_index], body, body_len);
 		app_buf_len += body_len;
 		printk("Got Http Body (%d) bytes, except (%d) bytes.\n",
 			app_buf_len, pctx->rsp.content_length);
@@ -207,7 +209,6 @@ static int do_download(struct stc_ota_cfg *p_ota_cfg)
 	int req_count_end = 0;
 	int repeate_count = 0;
 	int restart_count = 0;
-	int write_size = 0;
 	char temp[200];
 	int ret;
 
@@ -228,10 +229,8 @@ restart:
 			req_count_end =
 			    req_count_start + OTA_COUNT_EACH_ONE - 1;
 			req_count -= OTA_COUNT_EACH_ONE;
-			write_size += OTA_COUNT_EACH_ONE;
 		} else {
 			req_count_end = req_count_start + req_count - 1;
-			write_size += req_count;
 			req_count = 0;	/*the last request */
 		}
 
@@ -260,7 +259,6 @@ repeate:
 				goto restart;
 			}
 
-
 			k_sleep(500);
 			goto repeate;
 		}
@@ -271,11 +269,9 @@ repeate:
 			OTA_INFO("Write Flash[0x%08lX]\n",
 			     flash_addr);
 
-			do_write(flash_addr, bin_buff, write_size, true);
-
+			do_write(flash_addr, bin_buff, BIN_BUF_SIZE, true);
 			flash_addr = flash_addr + BIN_BUF_SIZE;
-			write_size = 0;
-			memset(bin_buff, 0, BIN_BUF_SIZE);
+			memset(bin_buff, 0xFF, BIN_BUF_SIZE);
 		}
 
 		k_sleep(50);

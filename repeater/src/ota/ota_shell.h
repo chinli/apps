@@ -28,7 +28,7 @@
 #define OTA_TEST_BIN_URL     "/sites/default/files/banner/sc9863.jpg"
 
 #define OTA_MODEM_BIN_SIZE      618512	/*byte */
-#define OTA_KERNEL_BIN_SIZE     251529	/*byte */
+#define OTA_KERNEL_BIN_SIZE     255529	/*byte */
 #define OTA_TEST_BIN_SIZE       147992
 
 #define HTTP_RSP_STATS_NOT_FOUND	"Not Found"
@@ -38,7 +38,7 @@
 #define OTA_HTTP_REPEAT_REQ_MAX 10
 #define WAIT_TIME (OTA_HTTP_REQ_TIMEOUT * 2)
 
-#define OTA_COUNT_EACH_ONE      2048	/* 4*1024 */
+#define OTA_COUNT_EACH_ONE      2048	/* 2*1024 */
 
 #define OTA_MODEM_START_ADDR_OFF	\
 			(CONFIG_CP_START_ADDR_CONTAINER - DT_FLASH_BASE_ADDRESS)
